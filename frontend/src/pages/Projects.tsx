@@ -11,6 +11,8 @@ export default function ProjectsPage() {
   const [startDate, setStartDate] = useState("");
   const [durationDays, setDurationDays] = useState<number | "">("");
   const [error, setError] = useState<string | null>(null);
+  const [firstAider, setFirstAider] = useState("");
+  const [safetyOfficer, setSafetyOfficer] = useState("");
 
   const load = async () => {
     const res = await api.get("/projects/");
@@ -36,6 +38,9 @@ export default function ProjectsPage() {
       setAddress("");
       setStartDate("");
       setDurationDays("");
+      setSafetyOfficer("");
+      setFirstAider("");
+
       load();
     } catch (err: any) {
       setError(err?.response?.data?.detail || "Failed to add project");
@@ -73,6 +78,12 @@ export default function ProjectsPage() {
               setDurationDays(e.target.value === "" ? "" : Number(e.target.value))
             }
           />
+          <label>Safety Officer</label>
+          <input value={firstAider} onChange={(e) => setName(e.target.value)} required />
+
+          <label>First Aider</label>
+          <input value={safetyOfficer} onChange={(e) => setName(e.target.value)} required />
+
           {error && <div className="error">{error}</div>}
           <button className="primary" type="submit">Add project</button>
         </form>
@@ -87,7 +98,8 @@ export default function ProjectsPage() {
               <th>Start</th>
               <th>End</th>
               <th>Status</th>
-              <th></th>
+              <th>Safety Officer</th>
+              <th>First Aider</th>
             </tr>
           </thead>
           <tbody>
