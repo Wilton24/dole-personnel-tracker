@@ -89,7 +89,7 @@ export default function ProjectDetailPage() {
           <tbody>
             {project.assignments.map((a) => (
               <tr key={a.id}>
-                <td>{a.personnel.name}</td>
+                <td>{a.personnel.full_name}</td>
                 <td>{a.role.name}</td>
                 <td>{a.is_override ? `Yes — ${a.override_reason}` : "No"}</td>
                 <td>
@@ -118,7 +118,7 @@ export default function ProjectDetailPage() {
             <option value="">Select...</option>
             {personnelList.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name} ({p.role.name}) — {p.status}
+                {p.full_name} ({p.role.name}) — {p.availability_status}
               </option>
             ))}
           </select>

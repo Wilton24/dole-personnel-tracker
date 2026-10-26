@@ -3,12 +3,43 @@ export interface Role {
   name: string;
 }
 
+export interface ProjectHistoryItem {
+  assignment_id: number;
+  project_id: number;
+  project_name: string;
+  project_status: "Ongoing" | "Completed";
+  start_date: string;
+  end_date?: string | null;
+  role: string;
+  is_current: boolean;
+  is_override: boolean;
+}
+
 export interface Personnel {
   id: number;
-  name: string;
-  contact_number?: string | null;
+  first_name: string;
+  middle_initial?: string | null;
+  last_name: string;
+  extension?: string | null;
+  full_name: string;
   role: Role;
-  status: "Available" | "Engaged";
+  contact_number?: string | null;
+  email?: string | null;
+  control_number?: string | null;
+  certificate_number?: string | null;
+  date_of_training?: string | null;
+  training_valid_until?: string | null;
+  notes?: string | null;
+  is_active: boolean;
+  availability_status: "Available" | "Engaged";
+  projects: ProjectHistoryItem[];
+  created_at?: string | null;
+}
+
+export interface PersonnelBrief {
+  id: number;
+  full_name: string;
+  role: Role;
 }
 
 export interface Project {
@@ -30,7 +61,7 @@ export interface Assignment {
   override_reason?: string | null;
   override_by?: number | null;
   created_at: string;
-  personnel: Personnel;
+  personnel: PersonnelBrief;
   role: Role;
 }
 
