@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..deps import get_current_user
-from ..utils import get_personnel_status
 
 router = APIRouter(prefix="/assignments", tags=["assignments"])
 
@@ -27,19 +26,26 @@ def create_assignment(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    project = db.query(models.Project).filter(models.Project.id == payload.project_id).first()
+    project = db.query(models.Project).filter(
+        models.Project.id == payload.project_id).first()
     if not project:
         raise HTTPException(404, "Project not found")
 
     personnel = (
-        db.query(models.Personnel).filter(models.Personnel.id == payload.personnel_id).first()
+        db.query(models.Personnel).filter(
+            models.Personnel.id == payload.personnel_id).first()
     )
     if not personnel:
         raise HTTPException(404, "Personnel not found")
 
-    role = db.query(models.Role).filter(models.Role.id == payload.role_id).first()
+    role = db.query(models.Role).filter(
+        models.Role.id == payload.role_id).first()
     if not role:
         raise HTTPException(400, "Invalid role_id")
+
+    if not personnel.is_active:
+        raise HTTPException(
+            400, f"{personnel.full_name} is inactive and can't be assigned")
 
     # Prevent assigning the same person to the same project twice
     duplicate = (
@@ -51,16 +57,17 @@ def create_assignment(
         .first()
     )
     if duplicate:
-        raise HTTPException(400, "This personnel is already assigned to this project")
+        raise HTTPException(
+            400, "This personnel is already assigned to this project")
 
-    current_status = get_personnel_status(db, personnel.id)
+    current_status = personnel.availability_status
     is_override = False
 
     if current_status == "Engaged":
         if not current_user.is_admin:
             raise HTTPException(
                 409,
-                f"{personnel.name} is already engaged on another ongoing project. "
+                f"{personnel.full_name} is already engaged on another ongoing project. "
                 "Only an admin can override this.",
             )
         if not payload.override_reason or not payload.override_reason.strip():
@@ -90,7 +97,8 @@ def delete_assignment(
     db: Session = Depends(get_db),
     _user: models.User = Depends(get_current_user),
 ):
-    assignment = db.query(models.Assignment).filter(models.Assignment.id == assignment_id).first()
+    assignment = db.query(models.Assignment).filter(
+        models.Assignment.id == assignment_id).first()
     if not assignment:
         raise HTTPException(404, "Assignment not found")
     db.delete(assignment)
